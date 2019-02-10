@@ -13,6 +13,11 @@ export default new Router({
     {
       path: '*',
       redirect: '/'
+    },
+    {
+      path: '/importer',
+      name: 'importer',
+      component: require('@/components/Importer').default
     }
   ]
 })

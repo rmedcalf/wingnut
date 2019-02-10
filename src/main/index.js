@@ -41,6 +41,7 @@ function getMenuTemplate() {
     label: '&File',
     submenu: [
       { label: 'Import File', click: () => { click_importFile(); } },
+      { label: 'Continue Import', click: () => { mainWindow.webContents.send('navigate', 'importer'); } },
       { label: 'Toggle Developer Tools', click: (item, focusedWindow) => { focusedWindow.toggleDevTools(); } },
       { label: 'Reload Window', accelerator: 'Ctrl+R', click:(item, f) => { f.reload(); } },
       { label: '&Quit', accelerator: 'Ctrl+W', click: () => { app.quit(); } }

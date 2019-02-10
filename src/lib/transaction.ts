@@ -54,9 +54,7 @@ export class Transaction {
 
     static async GetAll() : Promise<Transaction[]> {
         let db = DatabaseFactory.getInstance();
-        let data = await db.table('transactions').toArray();
-        return data.map(d => {
-            return d as Transaction;
-        });
+        let data = await db.table('transactions').toCollection().reverse().sortBy('date');
+        return <Array<Transaction>>data;
     }
 }
