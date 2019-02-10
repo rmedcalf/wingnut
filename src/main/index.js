@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu } from 'electron'
+import { app, BrowserWindow, Menu, dialog } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -40,12 +40,24 @@ function getMenuTemplate() {
   let template = [{
     label: '&File',
     submenu: [
+      { label: 'Import File', click: () => { click_importFile(); } },
       { label: 'Toggle Developer Tools', click: (item, focusedWindow) => { focusedWindow.toggleDevTools(); } },
       { label: 'Reload Window', accelerator: 'Ctrl+R', click:(item, f) => { f.reload(); } },
       { label: '&Quit', accelerator: 'Ctrl+W', click: () => { app.quit(); } }
     ]
   }];
   return template;
+}
+
+function click_importFile() {
+  dialog.showOpenDialog({ title: 'Open CSV', properties: ['openFile'] }, async (filePaths) => {
+    if(filePaths && filePaths.length) {
+      let filePath = filePaths[0];
+      const csvReader = require('csvtojson');
+      const data = await csvReader().fromFile(filePath);
+      console.log(data);
+    }
+  });
 }
 
 app.on('ready', createWindow)
