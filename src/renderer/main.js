@@ -1,3 +1,4 @@
+import './style.scss'
 import Vue from 'vue'
 import axios from 'axios'
 
