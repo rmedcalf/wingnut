@@ -1,5 +1,5 @@
 import { app, BrowserWindow, Menu, dialog } from 'electron'
-
+import { Transaction } from '../lib/transaction'
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -55,7 +55,13 @@ function click_importFile() {
       let filePath = filePaths[0];
       const csvReader = require('csvtojson');
       const data = await csvReader().fromFile(filePath);
-      console.log(data);
+      let mapped = data.filter(d => d.Type == 'Trade').map(d => {
+        let t = new Transaction();
+        t.readFromCsv(d);
+        return t;
+      });
+      
+      mainWindow.webContents.send('csv-read', mapped);
     }
   });
 }

@@ -4,9 +4,17 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+  import { ipcRenderer } from 'electron'
+  import { Transaction } from '../lib/transaction'
+
   export default {
-    name: 'wingnut'
+    name: 'wingnut',
+    created() {
+      ipcRenderer.on('csv-read', async(event : any, items: Array<Transaction>) => {
+        await Transaction.insert(items);
+      });
+    }
   }
 </script>
 
