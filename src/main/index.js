@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, Menu } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -20,14 +20,32 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
-    width: 1000
+    width: 1000,
+    resizable: true
   })
+
+  mainWindow.maximize();
 
   mainWindow.loadURL(winURL)
 
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+
+  let menu = Menu.buildFromTemplate(getMenuTemplate());
+  Menu.setApplicationMenu(menu);
+}
+
+function getMenuTemplate() {
+  let template = [{
+    label: '&File',
+    submenu: [
+      { label: 'Toggle Developer Tools', click: (item, focusedWindow) => { focusedWindow.toggleDevTools(); } },
+      { label: 'Reload Window', accelerator: 'Ctrl+R', click:(item, f) => { f.reload(); } },
+      { label: '&Quit', accelerator: 'Ctrl+W', click: () => { app.quit(); } }
+    ]
+  }];
+  return template;
 }
 
 app.on('ready', createWindow)
