@@ -1,13 +1,14 @@
 import Dexie from 'dexie'
 import { DatabaseFactory } from './db';
+import { Action } from './enums';
 
 export class Transaction {
     action: string;
     $date: string;
     date: Date;
-    strike: Number;
+    strike: number;
     symbol: string;
-    value: Number;
+    value: number;
     expiration: string;
     $symbol: string;
     $id: string;
@@ -15,6 +16,9 @@ export class Transaction {
     type: string;
     qty: number;
     raw: any;
+    status: Action | null = null;
+    selected: boolean = false;
+    fromFile: string = '';
 
     constructor() {
         this.action = '';
@@ -56,5 +60,11 @@ export class Transaction {
         let db = DatabaseFactory.getInstance();
         let data = await db.table('transactions').toCollection().reverse().sortBy('date');
         return <Array<Transaction>>data;
+    }
+
+    static async Filter(filter: {(tx: Transaction): boolean}) : Promise<Transaction[]> {
+        let db = DatabaseFactory.getInstance();
+        let data = await db.table('transactions').filter(filter).reverse().sortBy('date');
+        return data as Transaction[];
     }
 }

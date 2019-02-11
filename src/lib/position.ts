@@ -1,20 +1,23 @@
 import { Transaction } from "./transaction";
 import { Status } from "./enums";
+import { DatabaseFactory } from "./db";
 
 export class Position {
-    strategy: string;
-    transactions: Array<Transaction>;
-    status: Status;
-    notes: string;
-    
-    constructor() {
-        this.notes = '';
-        this.status = Status.New;
-        this.strategy = '';
-        this.transactions = new Array<Transaction>();   
-    }
+    symbol: string | null = null;
+    strategy: string | null = null;
+    transactions: Transaction[] = [];
+    status: Status = Status.New;
+    notes: string | null = null;
+    originalCost: number = 0;
+    totalCost : number = 0;
+    finalValue: number = 0;
+    startDate: Date | null = null;
+    endDate: Date | null = null;
+    daysInTrade: number = 0;
+    profit: number = 0;
 
-    addTransaction(transaction: Transaction) : void {
-        this.transactions.push(transaction);
+    async save() {
+        let db = DatabaseFactory.getInstance();
+        await db.table('positions').add(this);
     }
 }

@@ -3,7 +3,11 @@
         <div class="columns">
             <div class="column">
                 <input type="date" v-model="expiration" placeholder="Expiration" />
+                <input type="text" v-model="ticker" placeholder="Ticker" />
                 <a href="#" @click.prevent="reset">Reset</a>
+            </div>
+            <div class="column">
+                
             </div>
         </div>
         <div class="columns">
@@ -32,27 +36,54 @@
                 </table>
             </div>
             <div class="column">
+                <new-position :selected="selected" @added="remove" @restore="restore" />
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { Transaction } from '../../lib/transaction'
+import NewPosition from './NewPosition.vue'
+import * as _ from 'lodash'
 
-@Component
+@Component({
+    components: { NewPosition }
+})
 export default class Importer extends Vue {
     expiration: string | null = null;
+    ticker : string | null = null;
     transactions: Transaction[] = [];
     selected: Transaction[] = [];
 
-    async created() {
-        this.transactions = await Transaction.GetAll();
+
+    @Watch('ticker') onTickerChange(value : string) {
+        this.transactions = this.transactions.filter(tx => tx.symbol.startsWith(value));
     }
 
-    filterBySymbol() {
+    async created() {
+        this.reset();
+    }
 
+    async filterBySymbol(symbol : string) {
+        this.transactions = await Transaction.Filter((tx) => {
+            return tx.symbol == symbol;
+        });
+    }
+
+    async restore(transaction: Transaction) {
+        this.transactions.push(transaction);
+        this.transactions = _.sortBy(this.transactions, ['date', '$id']).reverse();
+    }
+
+    remove(transactions: Transaction[]) {
+        _.pullAllBy(this.transactions, transactions, '$id');
+        this.selected = [];
+    }
+
+    async reset() {
+        this.transactions = await Transaction.GetAll();
     }
 }
 </script>

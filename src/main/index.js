@@ -1,5 +1,7 @@
 import { app, BrowserWindow, Menu, dialog } from 'electron'
 import { Transaction } from '../lib/transaction'
+import { CSVFile } from '../lib/db';
+const path = require('path');
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -40,6 +42,7 @@ function getMenuTemplate() {
   let template = [{
     label: '&File',
     submenu: [
+      { label: 'Positions', click: () => { mainWindow.webContents.send('navigate', 'dashboard'); } },
       { label: 'Import File', click: () => { click_importFile(); } },
       { label: 'Continue Import', click: () => { mainWindow.webContents.send('navigate', 'importer'); } },
       { label: 'Toggle Developer Tools', click: (item, focusedWindow) => { focusedWindow.toggleDevTools(); } },
@@ -59,10 +62,11 @@ function click_importFile() {
       let mapped = data.filter(d => d.Type == 'Trade').map(d => {
         let t = new Transaction();
         t.readFromCsv(d);
+        t.fromFile = path.basename(filePath);
         return t;
       });
-      
-      mainWindow.webContents.send('csv-read', mapped);
+      let file = new CSVFile(filePath, 'tastyworks', mapped);
+      mainWindow.webContents.send('csv-read', file);
     }
   });
 }
