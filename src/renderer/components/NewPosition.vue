@@ -76,7 +76,7 @@
         </div>
         <div class="columns">
             <div class="column">
-                Profit: <span :class="{ profit: profit >= 0, loss: profit < 0 }">{{ profit | money }}</span>
+                Cost: <span :class="{ profit: profit >= 0, loss: profit < 0 }">{{ profit | money }}</span>
             </div>
         </div>
         <div class="columns" v-if="status == 'closed'">
@@ -204,9 +204,6 @@ export default class NewPosition extends Vue {
     close() : void {
         this.addAction(Action.Closing);
         this.status = 'closed';
-        this.transactions.forEach(transaction => {
-            this.profit += transaction.value;
-        });
         this.endDate = this.getDateForTransactionType(Action.Closing);
     }
 
@@ -225,7 +222,11 @@ export default class NewPosition extends Vue {
     private addAction(action: Action) : void {
         let tx = [...this.selected];
         this.setStatus(tx, action);
+        this.profit = 0;
         this.transactions = this.transactions.concat(tx);
+        this.transactions.forEach(transaction => {
+            this.profit += transaction.value;
+        });
         this.$emit('added', this.selected);
     }
 
